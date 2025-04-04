@@ -1,20 +1,26 @@
 public class Fitness {
-    static int calculateCost(int[] assignment, int fac, int loc, int[][] flow, int[][] distance) {
+    private int[][] distanceMatrix;
+    private int [][] flowMatrix;
+    public Fitness(int[][] flow, int[][] distance){
+        flowMatrix = flow.clone();
+        distanceMatrix = distance.clone();
+    }
+    int calculateCost(int[] assignment, int fac, int loc) {
         int cost = 0;
         for (int c = 0; c < assignment.length; c++) {
             if (assignment[c] != -1) {
-                cost += flow[fac][assignment[c]] * distance[loc][c];
-                cost += flow[assignment[c]][fac] * distance[c][loc];
+                cost += flowMatrix[fac][assignment[c]] * distanceMatrix[loc][c];
+                cost += flowMatrix[assignment[c]][fac] * distanceMatrix[c][loc];
             }
         }
         return cost;
     }
 
-    static int calculateCost(int[] assignment, int[][] flow, int[][] distance) {
+    int calculateCost(int[] assignment) {
         int cost = 0;
         for (int c = 0; c < assignment.length; c++) {
             for (int d=0; d<assignment.length; d++) {
-                cost += flow[c][d] * distance[assignment[c]][assignment[d]];
+                cost += flowMatrix[c][d] * distanceMatrix[assignment[c]][assignment[d]];
             }
         }
         return cost;

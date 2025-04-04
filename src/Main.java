@@ -3,14 +3,18 @@ import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
 import java.lang.Thread;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 public class Main {
     private static Random RANDOM;
-    private static int maxItter = 30;
-    private static int maxNonImpr = 300;
+    private static int maxItter = 100;
+    private static int restarts = 10;
+    private static Fitness Fitness;
     public static void main(String[] args) throws InterruptedException {
         RANDOM = new Random(23);
+
         int nExperiments = 10;
 
         String instance = "";
@@ -25,105 +29,58 @@ public class Main {
         int[][] flowMatrix = input.getFlowMatrix();
         int listSize = input.getLength();
         int[] bestAns = input.getBestSolution();
+        String inst = input.getCurrentFile();
 
+        Fitness = new Fitness(flowMatrix, distanceMatrix);
 
         System.out.println(listSize);
 
         List<Integer> ret = new ArrayList<>(listSize);
+        int[] rett = new int[listSize];
         for (int i=0; i<listSize; i++) {
             ret.add(i);
+            rett[i] = i;
         }
 
+        String[] methods = {"RandomSearch", "RandomWalk", "Custom", "Greedy", "Steepest"};
 
-        long startTime = System.currentTimeMillis();
+        SolutionSaver current = new SolutionSaver(methods[2], inst, listSize, bestAns, Fitness.calculateCost(bestAns));
+
+        int[] time = new int[nExperiments];
+
         for (int i = 1; i <= nExperiments; i++) {
-            int[] randomSolution = shuffleInt(ret);
-            //List<Integer> pair = random2(ret);
-            //int[] greedySolution = greedySolver(flowMatrix, distanceMatrix);
-            int[] LSSol = localSearch(randomSolution, flowMatrix, distanceMatrix);
+            int[] randomSolution = Randoms.shuffleInt(ret, RANDOM);
+            long startTime = System.currentTimeMillis();
+
+            //int[] solution = Randoms.randomSolver(rett, RANDOM, Fitness, maxItter, current);
+            //int[] solution = Randoms.randomWalkSolver(randomSolution, Fitness, RANDOM, restarts, maxItter, current);
+            int[] solution = Greedy.greedyConstruction(randomSolution, distanceMatrix, flowMatrix, Fitness, current);
+            //int[] solution = LocalSearch.Greedy(randomSolution, Fitness, maxItter, RANDOM, restarts, current);
+            //int[] solution = LocalSearch.Steepest(randomSolution, Fitness, maxItter, RANDOM, restarts, current);
+
+            long timeAll = System.currentTimeMillis() - startTime;
+            time[i-1] = (int) timeAll;
+
             for (int j = 0; j < listSize; j++)
-                System.out.print(LSSol[j]+" ");
-            System.out.println(Fitness.calculateCost(LSSol, flowMatrix, distanceMatrix));
+                System.out.print(solution[j]+" ");
+            System.out.println(Fitness.calculateCost(solution));
             System.out.println();
         }
-        float timeAll = System.currentTimeMillis() - startTime;
-        float timeOnce = timeAll/nExperiments;
+
+        current.saveTime(time);
 
         for (int j = 0; j < listSize; j++)
             System.out.print(bestAns[j]+" ");
-        System.out.println(Fitness.calculateCost(bestAns, flowMatrix, distanceMatrix));
+        System.out.println(Fitness.calculateCost(bestAns));
         System.out.println();
 
-        System.out.println("Full time " + timeAll);
-        System.out.println("Average time of a run: " + timeOnce);
+        System.out.println("Full time " + Arrays.stream(time).sum());
     }
 
-    public static List<Integer> shuffleList(List<Integer> nodeList){
-        List<Integer> base = new ArrayList<>(nodeList);
-        List<Integer> randomized = new ArrayList<>(nodeList.size());
-        for (int j =0; j<nodeList.size(); j++) {
-            int id = RANDOM.nextInt(base.size());
-            randomized.add(base.get(id));
-            base.remove(id);
-        }
-        return randomized;
-    }
 
-    public static int[] shuffleInt(List<Integer> nodeList){
-        List<Integer> base = new ArrayList<>(nodeList);
-        int[] randomized = new int[nodeList.size()];
-        for (int j =0; j<nodeList.size(); j++) {
-            int id = RANDOM.nextInt(base.size());
-            randomized[j] = base.get(id);
-            base.remove(id);
-        }
-        return randomized;
-    }
 
-    public static List<Integer> random2(List<Integer> nodeList){
-        int a = RANDOM.nextInt(nodeList.size());
-        int b = RANDOM.nextInt(nodeList.size()-1);
-        if (b>=a) { b= b+1;}
-        int finalB = b;
-        return new ArrayList<>() {{add(a); add(finalB);}};
-    }
 
-    public static int[] localSearch(int [] initial, int[][] flow, int[][] distance) {
-        int currentFit = Fitness.calculateCost(initial, flow, distance);
-        int[] currentSol = initial.clone();
 
-        int nonImpr = 0;
-        for (int i = 0; i<maxItter && nonImpr<maxNonImpr; i++) {
-            boolean improve = false;
-
-            for (int a =0; a<initial.length; a++) {
-                for (int b=0; b<initial.length; b++) {
-                    int[] swapped = initial.clone();
-                    swapped[a] =  initial[b];
-                    swapped[b] = initial[a];
-
-                    int newFit = Fitness.calculateCost(swapped, flow, distance);
-
-                    if (newFit<currentFit) {
-                        currentSol = swapped;
-                        currentFit = newFit;
-                        improve = true;
-                        break;
-                    }
-                }
-                if (improve) {
-                    break;
-                }
-            }
-            if (improve) {
-                nonImpr = 0;
-            }
-            else {
-                nonImpr++;
-            }
-        }
-        return currentSol;
-    }
 
 
 }

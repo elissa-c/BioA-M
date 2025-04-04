@@ -10,20 +10,19 @@ public class INput {
     private int [][] flowMatrix;
     private int[] bestSolution;
     private int bestCost;
+    private String currentFile;
 
     public INput(String file) {
-        String filePath = "";
-        String solutionPath = "";
+        currentFile = "";
         // Read file name
         if (file == null){
-            filePath = "qapdatsol/bur26a.dat";
-            solutionPath = "qapdatsol/bur26a.sln";
+            currentFile = "bur26a";
         }
         else {
-            filePath = String.format("qapdatsol/%s.dat", file);
-            solutionPath = String.format("qapdatsol/%s.sln", file);
+            currentFile = file;
         }
-
+        String filePath = String.format("qapdatsol/%s.dat", currentFile);
+        String solutionPath = String.format("qapdatsol/%s.sln", currentFile);
         //Generate flow matrix
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -114,5 +113,9 @@ public class INput {
 
     public int getLength() {
         return length;
+    }
+
+    public String getCurrentFile() {
+        return currentFile;
     }
 }
