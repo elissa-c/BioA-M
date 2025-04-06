@@ -35,15 +35,20 @@ public class INput {
                 line = br.readLine();
                 if (line==null || line.equals(" ")|| line.isEmpty()) {line = br.readLine();}
 
-                String[] data = line.split(" ");
-
                 int a =0;
-                for (String item: data) {
-                    if (item.equals(" ") || item.isEmpty()) { continue; }
-                    else{
-                        int x = Integer.parseInt(item.trim());
-                        flowMatrix[i][a] = x;
-                        a++;
+                while (a<length) {
+                    String[] data = line.split(" ");
+                    for (String item : data) {
+                        if (item.equals(" ") || item.isEmpty()) {
+                            continue;
+                        } else {
+                            int x = Integer.parseInt(item.trim());
+                            flowMatrix[i][a] = x;
+                            a++;
+                        }
+                    }
+                    if (a<length) {
+                        line = br.readLine();
                     }
                 }
             }
