@@ -16,7 +16,7 @@ public class INput {
         currentFile = "";
         // Read file name
         if (file == null){
-            currentFile = "bur26a";
+            currentFile = "sko100a";
         }
         else {
             currentFile = file;
@@ -26,7 +26,7 @@ public class INput {
         //Generate flow matrix
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-            length = Integer.parseInt(br.readLine());
+            length = Integer.parseInt(br.readLine().strip());
 
             distanceMatrix = new int[length][length];
             flowMatrix = new int[length][length];
@@ -57,14 +57,20 @@ public class INput {
                 line = br.readLine();
                 if (line==null || line.equals(" ")|| line.isEmpty()) {line = br.readLine();}
 
-                String[] data = line.split(" ");
-
                 int a =0;
-                for (String item: data) {
-                    if (item.equals(" ") || item.isEmpty()) { continue; }
-                    int x = Integer.parseInt(item.trim());
-                    distanceMatrix[i][a] = x;
-                    a++;
+                while (a<length) {
+                    String[] data = line.split(" ");
+                    for (String item : data) {
+                        if (item.equals(" ") || item.isEmpty()) {
+                            continue;
+                        }
+                        int x = Integer.parseInt(item.trim());
+                        distanceMatrix[i][a] = x;
+                        a++;
+                    }
+                    if (a<length) {
+                        line = br.readLine();
+                    }
                 }
             }
 
