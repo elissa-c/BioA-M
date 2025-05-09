@@ -36,7 +36,7 @@ public class Randoms {
 
         long startTime = System.currentTimeMillis();
 
-        while(System.currentTimeMillis()-startTime<8){
+        while(System.currentTimeMillis()-startTime<2){
             int[] sol = shuffleList(initial, RANDOM);
             int fit = fitness.calculateCost(sol);
             if (fit<bestFit) {
@@ -50,16 +50,15 @@ public class Randoms {
         return bestSol;
     }
 
-    public static int[] randomWalkSolver(int[] initial, Fitness fitness, Random RANDOM, int restarts, int maxItter, SolutionSaver s) {
+    public static int[] randomWalkSolver(int[] initial, Fitness fitness, Random RANDOM, long startTime, SolutionSaver s) {
         int[] bestSol = initial.clone();
         int bestFit = fitness.calculateCost(initial);
 
         int steps = 0;
         int evaluations=0;
 
-        long startTime = System.currentTimeMillis();
 
-        while(System.currentTimeMillis()-startTime<8){
+        while(System.currentTimeMillis()-startTime<1){
             List<Integer> switched = random2(initial, RANDOM);
             int[] swapped = initial.clone();
             swapped[switched.getFirst()] =  initial[switched.getLast()];

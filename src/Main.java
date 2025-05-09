@@ -1,7 +1,4 @@
-import java.util.Arrays;
-import java.util.Random;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 import java.lang.Thread;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -42,21 +39,30 @@ public class Main {
             rett[i] = i;
         }
 
-        String[] methods = {"RandomSearch", "RandomWalk", "Custom", "Greedy", "Steepest"};
 
-        SolutionSaver current = new SolutionSaver(methods[2], inst, listSize, bestAns, Fitness.calculateCost(bestAns));
+        String[] methods = {"RandomSearch", "RandomWalk", "Heuristic", "Greedy", "Steepest", "SimulatedAnnealing", "Tabu"};
+
+        SolutionSaver current = new SolutionSaver(methods[3], inst, listSize, bestAns, Fitness.calculateCost(bestAns));
 
         int[] time = new int[nExperiments];
 
         for (int i = 1; i <= nExperiments; i++) {
+            List<List<Integer>> population = new ArrayList<>();
+            for (int id = 0; id < 20; id++) {
+                Collections.shuffle(ret);
+                List<Integer> sol = ret;
+                population.add(sol);
+            }
             int[] randomSolution = Randoms.shuffleInt(ret, RANDOM);
             long startTime = System.currentTimeMillis();
 
             //int[] solution = Randoms.randomSolver(rett, RANDOM, Fitness, maxItter, current);
-            //int[] solution = Randoms.randomWalkSolver(randomSolution, Fitness, RANDOM, restarts, maxItter, current);
-            int[] solution = Greedy.greedyConstruction(randomSolution, distanceMatrix, flowMatrix, Fitness, current);
-            //int[] solution = LocalSearch.Greedy(randomSolution, Fitness, maxItter, RANDOM, restarts, current);
+            //int[] solution = Randoms.randomWalkSolver(randomSolution, Fitness, RANDOM, startTime, current);
+            //int[] solution = Greedy.greedySolver(randomSolution, distanceMatrix, flowMatrix, Fitness, current);
+            int[] solution = LocalSearch.Greedy(randomSolution, Fitness, maxItter, RANDOM, restarts, current);
             //int[] solution = LocalSearch.Steepest(randomSolution, Fitness, maxItter, RANDOM, restarts, current);
+            //int[] solution = SimAnnealing.generateHEA(population, Fitness, RANDOM, 1415, current);
+            //int[] solution = Tabu.tabuSearch(randomSolution, Fitness, RANDOM, 3000, current);
 
             long timeAll = System.currentTimeMillis() - startTime;
             time[i-1] = (int) timeAll;

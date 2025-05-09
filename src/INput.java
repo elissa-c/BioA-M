@@ -16,7 +16,7 @@ public class INput {
         currentFile = "";
         // Read file name
         if (file == null){
-            currentFile = "sko100a";
+            currentFile = "tho150";
         }
         else {
             currentFile = file;

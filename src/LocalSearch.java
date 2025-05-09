@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Random;
 
 public class LocalSearch {
@@ -9,8 +10,7 @@ public class LocalSearch {
 
         for (int t = 0; t<restarts; t++) {
 
-            int[] currentSol = Randoms.shuffleList(initial, RANDOM);
-            int currentFit = fit.calculateCost(currentSol);
+            int[] currentSol = initial.clone();
 
             for (int i = 0; i < maxItter ; i++) {
                 boolean improve = false;
@@ -19,16 +19,13 @@ public class LocalSearch {
                 for (int c = 0; c < initial.length; c++) {
                     int a = order[c];
                     for (int b = 0; b < initial.length; b++) {
-                        int[] swapped = initial.clone();
-                        swapped[a] = initial[b];
-                        swapped[b] = initial[a];
-
-                        int newFit = fit.calculateCost(swapped);
+                        int delta = fit.computeDelta(currentSol, a, b);
                         evals++;
 
-                        if (newFit < currentFit) {
-                            currentSol = swapped;
-                            currentFit = newFit;
+                        if (delta < 0) {
+                            int x = currentSol[a];
+                            currentSol[a] = currentSol[b];
+                            currentSol[b] = x;
                             improve = true;
                             step++;
                             break;
@@ -42,6 +39,7 @@ public class LocalSearch {
                     break;
                 }
             }
+            int currentFit = fit.calculateCost(currentSol);
             if (currentFit < bestFit) {
                 bestSol = currentSol;
                 bestFit = currentFit;
@@ -51,53 +49,56 @@ public class LocalSearch {
         return bestSol;
     }
 
-    public static int[] Steepest(int [] initial, Fitness fit, int maxItter, Random RANDOM, int restarts, SolutionSaver s) {
+    public static int[] Steepest(int[] initial, Fitness fit, int maxItter, Random RANDOM, int restarts, SolutionSaver s) {
         int[] bestSol = new int[initial.length];
         int bestFit = Integer.MAX_VALUE;
         int step = 0;
         int evals = 0;
 
-        for (int t = 0; t<restarts; t++) {
+        for (int t = 0; t < 1; t++) {
+            int[] currentSol = Arrays.copyOf(initial, initial.length);
 
-            int[] currentSol = Randoms.shuffleList(initial, RANDOM);
-            int currentFit = fit.calculateCost(currentSol);
-
-            for (int i = 0; i < maxItter ; i++) {
-                int[] topChange = currentSol.clone();
-                int topFit = currentFit;
+            for (int i = 0; i < maxItter; i++) {
+                int bestDelta = 0;
+                int[] swap = new int[2];
+                boolean foundImprovement = false;
 
                 int[] order = Randoms.shuffleList(initial, RANDOM);
                 for (int c = 0; c < initial.length; c++) {
                     int a = order[c];
                     for (int b = 0; b < initial.length; b++) {
-                        int[] swapped = initial.clone();
-                        swapped[a] = initial[b];
-                        swapped[b] = initial[a];
-
-                        int newFit = fit.calculateCost(swapped);
+                        if (a == b) continue;
+                        int delta = fit.computeDelta(currentSol, a, b);
                         evals++;
-
-                        if (newFit < topFit) {
-                            topChange = swapped;
-                            topFit = newFit;
+                        if (delta < bestDelta) {
+                            swap[0] = a;
+                            swap[1] = b;
+                            bestDelta = delta;
+                            foundImprovement = true;
                         }
                     }
-
                 }
-                if (topFit < currentFit) {
-                    currentSol = topChange;
-                    currentFit = topFit;
+
+                if (foundImprovement) {
+                    int temp = currentSol[swap[0]];
+                    currentSol[swap[0]] = currentSol[swap[1]];
+                    currentSol[swap[1]] = temp;
                     step++;
                 } else {
                     break;
                 }
             }
+
+            int currentFit = fit.calculateCost(currentSol);
+            evals++;
             if (currentFit < bestFit) {
-                bestSol = currentSol;
+                bestSol = Arrays.copyOf(currentSol, currentSol.length);
                 bestFit = currentFit;
             }
         }
+
         s.saveSolution(initial, fit.calculateCost(initial), bestSol, bestFit, step, evals);
         return bestSol;
     }
+
 }

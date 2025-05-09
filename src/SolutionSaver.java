@@ -49,8 +49,9 @@ public class SolutionSaver {
             writer.newLine();
             for (Integer id : initialSol) {
                 writer.write(id.toString());
-                writer.newLine();
+                writer.write(" ");
             }
+            writer.newLine();
             writer.write(String.valueOf(steps));
             writer.newLine();
             writer.write(String.valueOf(evaluations));
@@ -63,7 +64,7 @@ public class SolutionSaver {
             // Write the solution
             for (Integer id : solution) {
                 writer.write(id.toString());
-                writer.newLine();
+                writer.write(" ");
             }
             runNumber++;
             System.out.println("Solution saved to: " + filePath);
@@ -91,7 +92,7 @@ public class SolutionSaver {
             writer.newLine();
             for (Integer i : bestSol){
                 writer.write(String.valueOf(i));
-                writer.newLine();
+                writer.write(" ");
             }
 
 
